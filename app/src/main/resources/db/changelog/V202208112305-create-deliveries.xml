@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="V202208112305" author="Maksim Kostromin">
+        <comment>Create `deliveries` table and `deliveries_last_modified_at_idx` index with rollback</comment>
+
+        <createTable tableName="deliveries">
+            <column name="notes" type="${text.type}"/>
+            <column name="budget" type="${decimal.type}"/>
+            <column name="state" type="${string.type}"/>
+            <column name="version" type="${string.type}"/>
+            <column name="last_modified_at" type="${timestamp.type}" defaultValueComputed="${current.timestamp.function}"/>
+            <column autoIncrement="true" name="id" type="${id.type}">
+                <constraints primaryKey="true" primaryKeyName="deliveries_pk"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="deliveries"
+                     indexName="deliveries_state_idx">
+            <column name="state"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="deliveries"
+                       indexName="deliveries_state_idx"/>
+
+            <dropTable tableName="deliveries"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
